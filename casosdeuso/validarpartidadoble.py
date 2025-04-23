@@ -1,0 +1,2 @@
+class ValidarPartidaDoble:
+    pass
