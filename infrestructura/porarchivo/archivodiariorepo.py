@@ -1,5 +1,5 @@
 from interfaces.abstractdiario import AbstractDiario
-from infrestructura.archivo import Archivo
+from infrestructura.porarchivo.archivo import Archivo
 from nucleo.entidades import Diario
 
 class ArchivoDiarioRepo(AbstractDiario,Archivo):
@@ -23,16 +23,31 @@ class ArchivoDiarioRepo(AbstractDiario,Archivo):
             for d in datos:
                 id,nom = d[:d.find('\n')].split(',')
                 if nombre == nom:
-                    return Diario(int(id),nombre)
+                    return Diario(int(id),nom)
 
     def ObtenerPorId(self,id):
-        pass
+        datos = self.leer()
+        if datos:
+            for d in datos:
+                id_c,nom = d[:d.find('\n')].split(',')
+                if id == int(id_c):
+                    return Diario(int(id),nom)
+                
 
     def actualizar(self,d:Diario):
         pass
 
+
     def eliminar(self,id):
-        pass
+        datos = self.leer()
+        if datos:
+            for d in datos:
+                id_c,nom = d[:d.find('\n')].split(',')
+                if id == int(id_c):
+                    datos.remove(d)
+        self.generar_archivo()
+        for d in datos:
+            self.guardar(d)
     
 
-repodiarios = ArchivoDiarioRepo('infrestructura/diarios.csv')
+repodiarios = ArchivoDiarioRepo('infrestructura/porarchivo/src/diarios.csv')

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from enum import Enum
 @dataclass
 class Diario:
     id: int
@@ -8,13 +9,22 @@ class Diario:
 class Asiento:
     id: int
     nombre: str
+    diario_id : int
     fecha: str
 
+class NaturalezaCuenta(Enum):
+    ACREDORA = 'Acredora'
+    DEUDORA = 'Deudora'
+    
 @dataclass
 class Cuenta:
     id: int
     nombre: str
-    tipo: str
+    tipo: NaturalezaCuenta
+
+class TipoMovimiento(Enum):
+    DEBE = 'Debe'
+    HABER = 'Haber'
 
 @dataclass
 class  Movimiento:
@@ -22,4 +32,4 @@ class  Movimiento:
     asiento_id: int
     cuenta_id: int
     monto: float
-    tipo: str
+    tipo: TipoMovimiento

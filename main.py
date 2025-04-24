@@ -1,6 +1,5 @@
-from infrestructura.archivodiariorepo import repodiarios
-from casosdeuso.generarDiario import GenerarDiario
+from infrestructura.web.routes import run
 
 
-uc = GenerarDiario(repodiarios)
-uc.execute('Diario 2')
+if __name__ == '__main__':
+    run()

@@ -13,3 +13,7 @@ class ErrorCuenta(Exception):
 class ErrorMovimiento(Exception):
     def __init__(self,msj='Error al crear movimiento'):
         super().__init__(msj)
+
+class AdvertenciaMovimiento(Exception):
+    def __init__(self,msj='Existe un problema con el movimiento'):
+        super().__init__(msj)
