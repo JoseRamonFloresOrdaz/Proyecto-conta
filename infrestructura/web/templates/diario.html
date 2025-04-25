@@ -1,0 +1,196 @@
+{% extends "index.html" %}
+{% block title %}Diario{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="text-center">
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="#">Navbar</a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNavAltMarkup">
+                <div class="navbar-nav">
+                  <a class="nav-link active" aria-current="page" href="/">Inicio</a>
+                  <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalprincipal">Crear Asiento</a>
+                  <a class="nav-link" href="/plantilla/">Crear Plantilla</a>
+                  <a class="nav-link disabled" href="#">Generar Balance</a>
+                </div>
+              </div>
+            </div>
+          </nav>
+    </div>
+<div class="lista-asientos" id="lista-asientos">
+</div>
+  </div>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="modalprincipal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Crear Asiento</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-danger"  id="resultadoAsiento" role="alert" style="display: none;">
+            </div>
+            <div class="mb-3">
+                <label for="nombreAsiento" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombreAsiento" placeholder="Nombre">
+            </div>
+    <div class="mb-3">
+        <label for="fechaAsiento" class="form-label">Fecha</label>
+        <input type="date" class="form-control" id="fechaAsiento" placeholder="Nombre">
+    </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button"  onclick="lanzarSubmodal()" class="btn btn-primary" data-bs-dismiss="modal" >Crear Asiento</button>
+        </div>
+      </div>
+    </div>
+
+    </div>
+    <div class="modal fade" id="subModal" tabindex="-1" aria-labelledby="subModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="subModalLabel">Agregar Primer Movimiento</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+            <label for="cuentaID" class="form-label">Cuenta</label>
+            <select id="cuentaID" class="form-select form-select-sm" ></select>
+            </div>
+            <div class="mb-3">
+                <label for="montomovimiento" class="form-label">Monto</label>
+                <input type="number" class="form-control" id="montoMovimiento" placeholder="Monto">
+              </div>
+              <div class="mb-3">
+            <label for="tipoMovimiento" class="form-label">Movimiento</label>
+            <select id="tipoMovimiento" class="form-select form-select-sm" >
+              <option value="DEBE">Debe</option>
+              <option value="HABER">Haber</option>
+            </select>
+            </div>
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" >Crear Movimiento</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  <script>
+      window.onload = () => {
+    fetch('/listaCuentas/')
+      .then(res => res.json())
+      .then(data => {
+        let cuentaSelect = document.getElementById('cuentaID');
+        data.forEach(c => {
+          cuentaSelect.innerHTML += `<option value="${c.id}">${c.nombre} (${c.tipo})</option>`;
+        });
+        listarAsientos();
+      })
+      .catch(err => console.error('Error al cargar cuentas:', err));
+  }
+  function esperarCierreModal(modalElement) {
+    return new Promise(resolve => {
+      const handler = () => {
+      modalElement.removeEventListener('hidden.bs.modal', handler);
+      resolve();
+    };
+    modalElement.addEventListener('hidden.bs.modal', handler);
+    });
+
+  }
+  var prinm =  document.getElementById('modalprincipal');
+  var subm = document.getElementById('subModal');
+  const prinmodal = new bootstrap.Modal(prinm);
+  const submodal = new bootstrap.Modal(subm);
+ async function lanzarSubmodal(){
+  submodal.show();
+  await esperarCierreModal(subm);
+  crearAsiento();
+ }
+ function obtenerDiarioId(){
+    const params = new URLSearchParams(window.location.search);
+    return params.get('id');
+}
+  function crearAsiento() {
+    const nombre = document.getElementById('nombreAsiento').value;
+    const diario_id = parseInt(obtenerDiarioId());
+    const fecha = document.getElementById('fechaAsiento').value;
+    const cuenta_id = parseInt(document.getElementById('cuentaID').value);
+    const monto = parseFloat(document.getElementById('montoMovimiento').value);
+    const tipo = document.getElementById('tipoMovimiento').value;
+
+    fetch('/crearAsiento/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        nombre,
+        diario_id,
+        fecha,
+        movimientos: [{ cuenta_id, monto, tipo }]
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data.text || data.error);
+      if(data.error){
+        var resultado = document.getElementById('resultadoAsiento');
+        resultado.style.display = "block";
+        resultado.innerText = data.error;
+        prinmodal.show();
+      }
+      listarAsientos();
+    })
+    .catch(err => {
+        console.error('Error al crear asiento:', err);
+    });
+  }
+
+function listarAsientos() {
+    fetch(`/listaAsientos/${obtenerDiarioId()}/`)
+      .then(res => res.json())
+      .then(data => {
+        const div = document.getElementById('lista-asientos');
+        const fecha = new Date();
+    const formateada = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getDate().toString().padStart(2, '0')}`;
+        div.innerHTML = '';
+        data.forEach(a => {
+          asiento = `<div class="asientos">
+        <div class="card">
+                <h5 class="card-header text-center">${a.nombre}</h5> 
+                <div class="card-body d-flex flex-row justify-content-around">
+                <div class="d-flex justify-content-center align-items-center" style="font-size:20px; font-weight:bold;">${a.fecha}</div>
+                <table style="font-size 20px">
+                    <thead>
+                    <tr><th width="200">Concepto</th><th <th width="200">Debe</th><th <th width="200">Haber</th>
+                    </thead><tbody>`;
+        a.movimientos.forEach(m => {
+          asiento += `
+            <tr>
+              <td>${m.tipo === 'Debe' ? m.cuenta.nombre :"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+m.cuenta.nombre}</td>
+              <td>${m.tipo === 'Debe' ? m.monto : ''}</td>
+              <td>${m.tipo === 'Haber' ? m.monto : ''}</td>
+            </tr>
+          `;
+        });
+            if (formateada === a.fecha){
+                asiento += `<tr><td  colspan="4" class="text-center"><button class="btn btn-primary">Agregar Movimiento</button></td></tr>`;
+            }
+            asiento +=`
+             </tbody>
+                </table>
+                              </div>
+            </div>
+          </div>
+        `;
+
+        div.innerHTML += asiento;
+      });
+      })
+      .catch(err => console.error('Error al listar asientos:', err));
+  }
+  </script>
+{% endblock %}

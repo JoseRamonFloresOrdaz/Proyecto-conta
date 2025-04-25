@@ -45,12 +45,21 @@ class ArchivoAsientoRepo(Archivo,AbstractAsiento):
                 
     def obtenerPorDiario(self,id):
         datos = self.leer()
+        asientos = []
         if datos:
             for d in datos:
                 id_c,nom,diario_id,fecha = d[:d.find('\n')].split(',')
                 if id == int(diario_id):
+                    asientos.append(Asiento(int(id_c),nom,diario_id,fecha))
+        return asientos
+    
+    def obtenerPorFecha(self,fec):
+        datos = self.leer()
+        if datos:
+            for d in datos:
+                id_c,nom,diario_id,fecha = d[:d.find('\n')].split(',')
+                if fecha == fec:
                     return Asiento(int(id_c),nom,diario_id,fecha)
-
 
     def actualizar(self,a:Asiento):
         pass

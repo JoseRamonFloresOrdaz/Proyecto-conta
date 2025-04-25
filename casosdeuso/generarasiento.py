@@ -13,5 +13,9 @@ class GenerarAsiento:
             raise ErrorAsiento(f'No existe un diario con el id {diario_id}')
         if self.__rep.ObtenerPorNombre(nombre):
             raise ErrorAsiento('Ya existe un asiento con ese nombre')
+        if self.__rep.obtenerPorFecha(fecha):
+            raise ErrorAsiento('Ya existe un asiento con esa fecha')
+
         return self.__rep.nuevo(Asiento(None,nombre,diario_id,fecha))
+
     

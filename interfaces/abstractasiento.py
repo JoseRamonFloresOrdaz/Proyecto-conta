@@ -13,6 +13,11 @@ class AbstractAsiento(ABC):
     @abstractmethod
     def actualizar(self,a:Asiento):
         pass
+    def obtenerPorFecha(self,fecha):
+        pass
+    @abstractmethod
+    def obtenerPorDiario(self,id):
+        pass
     @abstractmethod
     def eliminar(self,id):
         pass

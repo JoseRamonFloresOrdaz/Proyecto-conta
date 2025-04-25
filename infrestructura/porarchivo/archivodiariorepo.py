@@ -24,6 +24,16 @@ class ArchivoDiarioRepo(AbstractDiario,Archivo):
                 id,nom = d[:d.find('\n')].split(',')
                 if nombre == nom:
                     return Diario(int(id),nom)
+                
+    def ObtenerDiarios(self):
+        diarios = []
+        datos = self.leer()
+        if datos:
+            for d in datos:
+                id,nom = d[:d.find('\n')].split(',')
+                diarios.append(Diario(int(id),nom))
+        return diarios
+
 
     def ObtenerPorId(self,id):
         datos = self.leer()

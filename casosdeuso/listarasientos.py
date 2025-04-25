@@ -3,10 +3,10 @@ class ListarAsientos:
         self.__repoac = repoac
         self.__repomov = repomov
 
-    def execute(self):
+    def execute(self,id):
         asientos = []
         listaMovimientos = []
-        for asiento in self.__repoac.ObtenerAsientos():
+        for asiento in self.__repoac.obtenerPorDiario(id):
             asientos.append(asiento)
             movimientos = []
             for movimiento in self.__repomov.obtenerPorAsiento(asiento.id):
