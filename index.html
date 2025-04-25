@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema Contable</title>
+  <style>
+   
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f4f9;
+    padding: 20px;
+  }
+
+  .card {
+    background: #fff;
+    padding: 20px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+  }
+
+  input,
+  select,
+  button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    font-size: 16px;
+  }
+
+  button {
+    background-color: #2980b9;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #3498db;
+  }
+
+  .success {
+    color: green;
+  }
+
+  .error {
+    color: red;
+  }
+
+  .asiento-card {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+  }
+
+  .movimiento {
+    margin-left: 15px;
+    font-size: 14px;
+    color: #555;
+  }
+
+
+  </style>
+</head>
+<body>
+
+  <h1>Gestión Contable</h1>
+
+  
+  <div class="card">
+    <h2>Crear Diario</h2>
+    <input type="text" id="nombreDiario" placeholder="Nombre del diario">
+    <button onclick="crearDiario()">Crear Diario</button>
+    <p id="resultadoDiario"></p>
+  </div>
+
+
+  <div class="card">
+    <h2>Crear Asiento</h2>
+    <input type="text" id="nombreAsiento" placeholder="Nombre del asiento">
+    <input type="number" id="diarioID" placeholder="ID del diario">
+    <input type="date" id="fechaAsiento">
+    <select id="cuentaID"></select>
+    <input type="number" id="montoMovimiento" placeholder="Monto">
+    <select id="tipoMovimiento">
+      <option value="DEBE">Debe</option>
+      <option value="HABER">Haber</option>
+    </select>
+    <button onclick="crearAsiento()">Crear Asiento</button>
+    <p id="resultadoAsiento"></p>
+  </div>
+
+ 
+  <div class="card">
+    <h2>Lista de Asientos</h2>
+    <button onclick="listarAsientos()">Cargar Asientos</button>
+    <div id="listaAsientos"></div>
+  </div>
+
+<script>
+  
+  window.onload = () => {
+    fetch('/listaCuentas/')
+      .then(res => res.json())
+      .then(data => {
+        let cuentaSelect = document.getElementById('cuentaID');
+        data.forEach(c => {
+          cuentaSelect.innerHTML += `<option value="${c.id}">${c.nombre} (${c.tipo})</option>`;
+        });
+      })
+      .catch(err => console.error('Error al cargar cuentas:', err));
+  }
+
+  function crearDiario() {
+    const nombre = document.getElementById('nombreDiario').value;
+    fetch('/crearDiario/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({nombre})
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('resultadoDiario').innerText = data.text || data.error;
+      document.getElementById('resultadoDiario').className = data.error ? 'error' : 'success';
+    })
+    .catch(err => console.error('Error al crear diario:', err));
+  }
+
+  function crearAsiento() {
+    const nombre = document.getElementById('nombreAsiento').value;
+    const diario_id = parseInt(document.getElementById('diarioID').value);
+    const fecha = document.getElementById('fechaAsiento').value;
+    const cuenta_id = parseInt(document.getElementById('cuentaID').value);
+    const monto = parseFloat(document.getElementById('montoMovimiento').value);
+    const tipo = document.getElementById('tipoMovimiento').value;
+
+    fetch('/crearAsiento/', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        nombre,
+        diario_id,
+        fecha,
+        movimientos: [{ cuenta_id, monto, tipo }]
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('resultadoAsiento').innerText = data.text || data.error;
+      document.getElementById('resultadoAsiento').className = data.error ? 'error' : 'success';
+    })
+    .catch(err => console.error('Error al crear asiento:', err));
+  }
+
+  function listarAsientos() {
+    fetch('/listaAsientos/')
+      .then(res => res.json())
+      .then(data => {
+        const div = document.getElementById('listaAsientos');
+        div.innerHTML = '';
+        data.forEach(a => {
+          div.innerHTML += `<div class="asiento-card"><strong>${a.nombre}</strong> (${a.fecha})<br>`;
+          a.movimientos.forEach(m => {
+            div.innerHTML += `<div class="movimiento">${m.tipo}: ${m.monto} - Cuenta: ${m.cuenta.nombre}</div>`;
+          });
+          div.innerHTML += `</div>`;
+        });
+      })
+      .catch(err => console.error('Error al listar asientos:', err));
+  }
+</script>
+
+</body>
+</html>
