@@ -1,0 +1,87 @@
+{% extends "index.html "%}
+
+{% block title %}Plantilla{% endblock %}
+
+{% block content %}
+<table id="balance">
+</table>
+<script>
+    var ref = document.getElementById('balance');
+json = {
+        "nombre": 'BALANCE GENERAL',
+        "empresa": "Mexico express SA",
+        "periodo": "1 al 30 de enero de 2025"
+    }
+    class Cuenta{
+        constructor(tipo,monto){
+            this.nombre = nombre;
+            this.tipo = tipo;
+            this.monto = 0;
+        }
+    }
+
+    class Balance{
+        constructor(nombre,empresa,periodo){
+            this.nombre = nombre;
+            this.empresa = empresa;
+            this.periodo = periodo;
+            this.activos_circulantes = []
+            this.suma_ac = 0
+            this.activos_no_circulantes = []
+            this.suma_anc = 0
+            this.suma_a = 0
+            this.pasivo_circulantes = []
+            this.suma_pc = 0
+            this.pasivos_no_circulantes = []
+            this.sumapnc = 0
+            this.sumap = 0
+            this.capital = []
+            this.sumacapital = 0
+            this.sumapmasc = 0 
+
+        }
+        agregarActivosCIrculantes(cuenta){
+            this.activos_circulantes.push(cuenta);
+        }
+        agregarActivosNoCirculantes(cuenta){
+            this.activos_no_circulantes.push(cuenta);
+        }
+        agregarPasivosCirculantes(cuenta){
+            this.pasivos_circulantes.push(cuenta);
+
+        }  
+        agregarPasivosNoCirculantes(cuenta){
+            this.pasivos_no_circulantes.push(cuenta);
+
+        }   
+        agregarCapital(cuenta){
+            this.capital.push(cuenta);
+        }  
+    }
+
+    class CargarBalance{
+        constructor(ref){
+            const secciones = ['activos_circulantes','activos_no_circualante','pasivos_circulantes','pasivos_no_circualantes','capital']
+            var elementos = []
+            console.log(elementos)
+            secciones.forEach(sec => {
+                var s = ref.querySelector(`#${sec}`)
+                if (s==undefined){
+                    ref.innerHTML += `<tbody id='${sec}'></tbody>`;
+                    s = ref.querySelector(`#${sec}`)
+                    elementos.push(s)
+                }
+                else{
+                    elementos.push(s)
+                }
+            });
+        }
+        cargarActivos(){}
+
+    }
+
+bal = new CargarBalance(ref)
+
+
+</script>
+{% endblock %}

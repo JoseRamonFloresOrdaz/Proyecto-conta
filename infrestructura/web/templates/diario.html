@@ -13,7 +13,7 @@
                 <div class="navbar-nav">
                   <a class="nav-link active" aria-current="page" href="/">Inicio</a>
                   <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalprincipal">Crear Asiento</a>
-                  <a class="nav-link" href="/plantilla/">Crear Plantilla</a>
+                  <a class="nav-link" href="plantilla/">Crear Plantilla</a>
                   <a class="nav-link disabled" href="#">Generar Balance</a>
                 </div>
               </div>
@@ -112,8 +112,8 @@
   crearAsiento();
  }
  function obtenerDiarioId(){
-    const params = new URLSearchParams(window.location.search);
-    return params.get('id');
+    path = window.location.pathname
+    return path.split('/')[2]; 
 }
   function crearAsiento() {
     const nombre = document.getElementById('nombreAsiento').value;

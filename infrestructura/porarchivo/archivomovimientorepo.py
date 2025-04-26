@@ -25,7 +25,7 @@ class ArchivoMovimientoRepo(Archivo,AbstractMovimiento):
             for d in datos:
                 id,asiento_id,cuenta_id,monto,tipo = d[:d.find('\n')].split(',')
                 if int(asiento_id) == aid:
-                    movimientos.append(Movimiento(id,asiento_id,cuenta_id,float(monto),TipoMovimiento.__members__.get(tipo.upper())))
+                    movimientos.append(Movimiento(id,asiento_id,int(cuenta_id),float(monto),TipoMovimiento.__members__.get(tipo.upper())))
         return movimientos
 
     def obtenerPorId(self,id):
@@ -34,7 +34,7 @@ class ArchivoMovimientoRepo(Archivo,AbstractMovimiento):
             for d in datos:
                 id_c,asiento_id,cuenta_id,monto,tipo = d[:d.find('\n')].split(',')
                 if id == int(id_c):
-                    return Movimiento(id,asiento_id,cuenta_id,float(monto),TipoMovimiento.__members__.get(tipo))
+                    return Movimiento(id,asiento_id,int(cuenta_id),float(monto),TipoMovimiento.__members__.get(tipo))
                 
                 
     def obtenerPorCuenta(self,cid):
@@ -44,7 +44,7 @@ class ArchivoMovimientoRepo(Archivo,AbstractMovimiento):
             for d in datos:
                 id,asiento_id,cuenta_id,monto,tipo = d[:d.find('\n')].split(',')
                 if int(cuenta_id) == cid:
-                    movimientos.append(Movimiento(id,asiento_id,cuenta_id,float(monto),TipoMovimiento.__members__.get(tipo)))
+                    movimientos.append(Movimiento(id,asiento_id,int(cuenta_id),float(monto),TipoMovimiento.__members__.get(tipo)))
         return movimientos
 
     def obtenerPorTipo(self, tipo):

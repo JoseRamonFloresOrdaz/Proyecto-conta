@@ -1,6 +1,7 @@
 from infrestructura.porarchivo.archivo import Archivo
 from interfaces.abstractasiento import AbstractAsiento
 from nucleo.entidades import Asiento
+from datetime import datetime
 
 
 class ArchivoAsientoRepo(Archivo,AbstractAsiento):
@@ -60,6 +61,16 @@ class ArchivoAsientoRepo(Archivo,AbstractAsiento):
                 id_c,nom,diario_id,fecha = d[:d.find('\n')].split(',')
                 if fecha == fec:
                     return Asiento(int(id_c),nom,diario_id,fecha)
+    def obtenerPorRangoDeFecha(self,inicio,fin):
+        datos = self.leer()
+        asientos = []
+        if datos:
+            for d in datos:
+                id_c,nom,diario_id,fecha = d[:d.find('\n')].split(',')
+                fecha = datetime.strptime(fecha, "%Y-%m-%d")
+                if inicio <= fecha <= fin:
+                    asientos.append(Asiento(int(id_c),nom,diario_id,fecha))
+        return asientos
 
     def actualizar(self,a:Asiento):
         pass

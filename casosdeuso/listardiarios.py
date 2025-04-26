@@ -3,10 +3,10 @@ class ListaDiarios:
         self.__rep = rep
     
     def execute(self,filtro=None,value=None):
-            filtros = ['id','nombre','todas']
-            match filtro := filtros:
+            match filtro:
                 case 'id':
-                    return self.__rep.ObtenerPorId(value)
+                    print("por id")
+                    return self.__rep.ObtenerPorId(int(value))
                 case 'nombre':
                     return self.__rep.ObtenerPorNombre(value)
                 case _: 

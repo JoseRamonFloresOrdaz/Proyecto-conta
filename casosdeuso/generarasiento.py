@@ -1,5 +1,6 @@
 from nucleo.entidades import Asiento
 from nucleo.excepciones import ErrorAsiento
+from datetime import datetime
 
 class GenerarAsiento:
     def __init__(self,acrep,drep):
@@ -15,6 +16,9 @@ class GenerarAsiento:
             raise ErrorAsiento('Ya existe un asiento con ese nombre')
         if self.__rep.obtenerPorFecha(fecha):
             raise ErrorAsiento('Ya existe un asiento con esa fecha')
+        if  int(fecha.split('-')[2]) > datetime.now().day:
+            raise ErrorAsiento('No puedes geenrar un asiento de una fecha que aun no ha llegado')
+        
 
         return self.__rep.nuevo(Asiento(None,nombre,diario_id,fecha))
 

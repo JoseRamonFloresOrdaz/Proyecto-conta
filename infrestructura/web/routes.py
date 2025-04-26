@@ -12,16 +12,16 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/diario/',methods=['GET'])
-def lista_diario():
+@app.route('/diario/<int:id>/',methods=['GET'])
+def lista_diario(id):
     return render_template("diario.html")
 
 @app.route('/balance/',methods=['GET'])
 def balance():
     pass
-@app.route('/plantilla/',methods=['GET'])
-def plantilla():
-    pass
+@app.route('/diario/<int:diario_id>/plantilla/',methods=['GET'])
+def plantilla(diario_id):
+    return render_template('plantilla.html')
 
 @app.route('/crearDiario/',methods=['POST'])
 def crear_diario():
