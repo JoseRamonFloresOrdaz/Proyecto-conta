@@ -5,10 +5,16 @@ class Diario:
     id: int
     nombre: str
 
+class TipoAsiento(Enum):
+    INGRESO = 'Ingreso'
+    DIARIO = 'Diario'
+    EGRESO = 'Egreso'
+
 @dataclass
 class Asiento:
     id: int
     nombre: str
+    tipo: TipoAsiento
     diario_id : int
     fecha: str
 

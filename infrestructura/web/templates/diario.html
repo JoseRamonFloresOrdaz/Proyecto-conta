@@ -5,14 +5,14 @@
     <div class="text-center">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid">
-              <a class="navbar-brand" href="#">Navbar</a>
+              <a class="navbar-brand" href="#">Lista de asientos</a>
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse d-flex justify-content-end" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
                   <a class="nav-link active" aria-current="page" href="/">Inicio</a>
-                  <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalprincipal">Crear Asiento</a>
+                  <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#modalasiento">Crear Asiento</a>
                   <a class="nav-link" href="plantilla/">Crear Plantilla</a>
                   <a class="nav-link disabled" href="#">Generar Balance</a>
                 </div>
@@ -20,177 +20,377 @@
             </div>
           </nav>
     </div>
-<div class="lista-asientos" id="lista-asientos">
-</div>
+<table class="mt-3 table table-hover">
+  <thead>
+    <tr class="text-center">
+      <th>Fecha</th>
+      <th>Nombre</th>
+      <th>Cargo</th>
+      <th>Abono</th>
+      <th>Operaciones</th>
+    </tr>
+  </thead>
+<tbody id="lista-asientos">
+
+</tbody>
+<tfoot>
+  <tr>
+    <td colspan="2" class="text-end"><strong>Total</strong></td>
+    <td id="total-cargos" class="text-end"></td>
+    <td id="total-abonos" class="text-end"></td>
+    <td></td>
+  </tr>
+</tfoot>
+</table>
   </div>
   
   <!-- Modal -->
-  <div class="modal fade" id="modalprincipal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
+  <div class="modal fade" id="modalasiento" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="staticBackdropLabel">Crear Asiento</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-            <div class="alert alert-danger"  id="resultadoAsiento" role="alert" style="display: none;">
+            <div class="row g-3 align-items-center">
+                <div class="col-auto">
+                    <label for="fechaAsiento" class="form-label">Fecha</label>
+                    <input type="date" class="form-control" id="fechaAsiento" name='fecha' placeholder="Nombre">
+                </div>
+                <div class="col-auto">
+                    <label for="tipoAsiento" class="form-label">Tipo</label>
+                    <select id="tipoAsiento" class="form-select"name='tipo'>
+                        <option selected>Seleccione una opción</option>
+                        <option value="Diario">Diario</option>
+                        <option value="Ingreso">Ingreso</option>
+                        <option value="Egreso">Egreso</option>
+                      </select>
+                </div>
+            <div class="col-5">
+                <label for="nombreAsiento" class="form-label">Concepto</label>
+                <input type="text" class="form-control" id="nombreAsiento" placeholder="Concepto"name='concepto'>
             </div>
-            <div class="mb-3">
-                <label for="nombreAsiento" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="nombreAsiento" placeholder="Nombre">
-            </div>
-    <div class="mb-3">
-        <label for="fechaAsiento" class="form-label">Fecha</label>
-        <input type="date" class="form-control" id="fechaAsiento" placeholder="Nombre">
+            <div class="col-2 d-flex align-items-center" style="margin-top: 45px;">
+            <button type="button" title="Agregar Movimiento" onclick="nuevoMovimiento()" class="btn btn-success"><i class="bi bi-plus-lg"></i></button>
+            <button type="button" title="Agregar Movimiento" onclick="nuevoMovimiento()" class="btn btn-secondary disabled"><i class="bi bi-pen"></i></button>
+            <button type="button" title="Agregar Movimiento" onclick="nuevoMovimiento()" class="btn btn-danger disabled"><i class="bi bi-trash-fill"></i></button>
+            <button type="button" title="Guardar" onclick="GuardarAsiento()" class="btn btn-primary" ><i class="bi bi-floppy"></i></button>
+        </div>
     </div>
+    <table class="mt-3 table table-hover">
+        <thead>
+            <tr>
+                <th style="width:60%;">Nombre</th>
+                <th>CARGO</th>
+                <th>ABONO</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-movimientos"></tbody>
+    </table>
         </div>
         <div class="modal-footer">
-          <button type="button"  onclick="lanzarSubmodal()" class="btn btn-primary" data-bs-dismiss="modal" >Crear Asiento</button>
+            <table class="col-4">
+                
+                
+                <tbody>
+                    <tr class="text-end">
+                        <td class="table-success">SALDOS IGUALES</td>
+                        <td id="saldoCargos">0</td>
+                        <td id="saldoAbonos">0</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
       </div>
-    </div>
+    </div> 
+</div>
+<!--Submodal movimientos-->
 
+<div class="modal fade" id="modalmovimiento" tabindex="-1" aria-labelledby="subModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="subModalLabel">Agregar Movimiento</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
     </div>
-    <div class="modal fade" id="subModal" tabindex="-1" aria-labelledby="subModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="subModalLabel">Agregar Primer Movimiento</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-            <label for="cuentaID" class="form-label">Cuenta</label>
-            <select id="cuentaID" class="form-select form-select-sm" ></select>
-            </div>
-            <div class="mb-3">
-                <label for="montomovimiento" class="form-label">Monto</label>
-                <input type="number" class="form-control" id="montoMovimiento" placeholder="Monto">
-              </div>
-              <div class="mb-3">
-            <label for="tipoMovimiento" class="form-label">Movimiento</label>
-            <select id="tipoMovimiento" class="form-select form-select-sm" >
-              <option value="DEBE">Debe</option>
-              <option value="HABER">Haber</option>
-            </select>
-            </div>
-            <button type="button" class="btn btn-primary" data-bs-dismiss="modal" >Crear Movimiento</button>
-          </div>
-        </div>
+    <div class="modal-body">
+      <div class="mb-3">
+      <label for="cuentaID" class="form-label">Cuenta</label>
+      <select id="cuentaID" name="cuenta" class="form-select form-select-sm" >
+        <option selected>Seleccione una opción</option>
+      </select>
       </div>
+      <div class="mb-3">
+          <label for="montomovimiento" class="form-label">Monto</label>
+          <input type="number" class="form-control"name="monto" id="montoMovimiento" placeholder="Monto">
+        </div>
+        <div class="mb-3">
+      <label for="tipoMovimiento" class="form-label">Movimiento</label>
+      <select id="tipoMovimiento" name="tipo" class="form-select form-select-sm" >
+        <option selected>Seleccione una opción</option>
+        <option value="Debe">Debe</option>
+        <option value="Haber">Haber</option>
+      </select>
+      </div>
+      <button type="button" class="btn btn-primary" onclick="GuardarMovimiento()">Crear Movimiento</button>
     </div>
-  <script>
-      window.onload = () => {
-    fetch('/listaCuentas/')
-      .then(res => res.json())
-      .then(data => {
-        let cuentaSelect = document.getElementById('cuentaID');
-        data.forEach(c => {
-          cuentaSelect.innerHTML += `<option value="${c.id}">${c.nombre} (${c.tipo})</option>`;
-        });
-        listarAsientos();
-      })
-      .catch(err => console.error('Error al cargar cuentas:', err));
-  }
-  function esperarCierreModal(modalElement) {
-    return new Promise(resolve => {
-      const handler = () => {
-      modalElement.removeEventListener('hidden.bs.modal', handler);
-      resolve();
-    };
-    modalElement.addEventListener('hidden.bs.modal', handler);
+  </div>
+</div>
+</div>
+<!--finsubmodal movimientos-->
+<!--alerta movimientos-->
+<div class="modal" tabindex="-1" aria-labelledby="alertaLabel" aria-hidden="true" id="modalalerta">
+<div class="modal-dialog modal-dialog-centered ">    
+  <div class="modal-content">
+      <div class="modal-header">
+          <h1 class="modal-title fs-5">Datos no válidos</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          Revisa que los datos estén correctos e intenta nuevamente.
+      </div>
+  </div>
+</div>
+</div>
+<!--finalerta movimientos-->
+<script>
+window.onload = () => {
+fetch('/listaCuentas/')
+  .then(res => res.json())
+  .then(data => {
+    let cuentaSelect = document.getElementById('cuentaID');
+    data.forEach(c => {
+      cuentaSelect.innerHTML += `<option value="${c.nombre}">${c.nombre} (${c.tipo})</option>`;
     });
-
-  }
-  var prinm =  document.getElementById('modalprincipal');
-  var subm = document.getElementById('subModal');
-  const prinmodal = new bootstrap.Modal(prinm);
-  const submodal = new bootstrap.Modal(subm);
- async function lanzarSubmodal(){
-  submodal.show();
-  await esperarCierreModal(subm);
-  crearAsiento();
- }
- function obtenerDiarioId(){
-    path = window.location.pathname
-    return path.split('/')[2]; 
+    listarAsientos();
+  })
+  .catch(err => console.error('Error al cargar cuentas:', err));
 }
-  function crearAsiento() {
-    const nombre = document.getElementById('nombreAsiento').value;
-    const diario_id = parseInt(obtenerDiarioId());
-    const fecha = document.getElementById('fechaAsiento').value;
-    const cuenta_id = parseInt(document.getElementById('cuentaID').value);
-    const monto = parseFloat(document.getElementById('montoMovimiento').value);
-    const tipo = document.getElementById('tipoMovimiento').value;
 
+class Movimiento {
+constructor(cuenta,monto,tipo) {
+    this.cuenta = cuenta;
+    this.monto = monto;
+    this.tipo = tipo;
+}
+
+isValid() {
+    let valid = true;
+
+    if (this.cuenta === null || this.cuenta === '' || this.cuenta === undefined) {
+        valid = false;
+    }
+
+    if (this.monto === null || this.monto === '' || isNaN(this.monto) || this.monto <= 0) {
+        valid = false;
+    }
+
+    if (this.tipo === null || this.tipo === '' || this.tipo === undefined) {
+        valid = false;
+    }
+
+    return valid;
+}
+
+toJSON(){
+  return {
+    'cuenta': this.cuenta,
+    'monto': this.monto,
+    'tipo': this.tipo
+  }
+}
+}
+class Asiento{
+    constructor(concepto,tipo,diario,fecha,movimientos){
+        this.concepto = concepto;
+        this.tipo = tipo;
+        this.diario = diario;
+        this.fecha = fecha;
+        this.movimientos = movimientos
+    }
+    validarPartidaDoble(){
+        cargos = 0
+        abonos = 0
+        this.movimientos.forEach(m => {
+            m.tipo == 'Debe' ? cargos += m.monto: abonos += m.monto
+        });
+        return cargos == abonos ? true:false;
+    }
+    isValid() {
+    let valid = true;
+
+    if (this.concepto === null || this.concepto === '' || this.concepto === undefined) {
+        valid = false;
+    }
+
+    if (this.tipo  === null || this.tipo === '' || this.tipo === undefined) {
+        valid = false;
+    }
+
+    if (this.fecha  === null || this.fecha === '' || this.fecha === undefined) {
+        valid = false;
+    }
+    if(this.movimientos.length < 2){
+      valid = false;
+    }
+
+    return valid;
+}
+toJSON(){
+  var movs = []
+  this.movimientos.forEach((m) => {
+    movs.push(m.toJSON())
+  })
+  return {
+    'concepto': this.concepto,
+    'tipo': this.tipo,
+    'diario_id': this.diario,
+    'fecha': this.fecha,
+    'movimientos':movs
+  }
+}
+}
+
+
+var asiento = document.getElementById('modalasiento');
+var ModalAsiento = new bootstrap.Modal(asiento);
+var alerta = document.getElementById('modalalerta');
+var ModalAlerta = new bootstrap.Modal(alerta);
+var movimiento = document.getElementById('modalmovimiento');
+var ModalMovimiento = new bootstrap.Modal(movimiento);
+
+
+var Listamovimientos = []
+function nuevoMovimiento(){
+ModalMovimiento.show();
+}
+
+
+function GuardarMovimiento() {
+ModalMovimiento.hide();
+const cuenta_id = document.getElementById('cuentaID').value;
+const monto = parseFloat(document.getElementById('montoMovimiento').value);
+const tipo = document.getElementById('tipoMovimiento').value;
+const DatosMovimiento = new Movimiento(cuenta_id, monto, tipo);
+if (DatosMovimiento.isValid()) {
+    console.log("Movimiento válido", DatosMovimiento);
+    Listamovimientos.push(DatosMovimiento);
+    ActualizarDatos();
+} else {
+    console.log("Movimiento inválido");
+    ModalMovimiento.hide();
+    ModalAlerta.show();
+    ModalAlerta._element.addEventListener('hidden.bs.modal', function (event) {
+    ModalMovimiento.show();
+    });
+}
+}
+
+var movimientos = document.getElementById('tabla-movimientos');
+var saldoCargos = document.getElementById('saldoCargos');
+var saldoAbonos = document.getElementById('saldoAbonos');
+function ActualizarDatos(){
+cargos = 0
+abonos = 0
+mov = ``
+ Listamovimientos.forEach(m => {
+    m.tipo == 'Debe' ? cargos += m.monto: abonos += m.monto
+    mov +=  `
+        <tr>
+          <td>${m.tipo === 'Debe' ? m.cuenta :"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+m.cuenta}</td>
+          <td>${m.tipo === 'Debe' ? m.monto.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }) : ''}</td>
+          <td>${m.tipo === 'Haber' ? m.monto.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }): ''}</td>
+        </tr>
+      `;
+ });
+ console.log(mov);
+ saldoCargos.innerHTML = cargos.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+ saldoAbonos.innerHTML= abonos.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+ movimientos.innerHTML = mov;
+}
+function GuardarAsiento(){
+ModalAsiento.hide();
+const nombre = document.getElementById('nombreAsiento').value;
+const tipo = document.getElementById('tipoAsiento').value;
+const fecha = document.getElementById('fechaAsiento').value;
+const DatosAsiento = new Asiento(nombre,tipo,parseInt(obtenerDiarioId()),fecha,Listamovimientos)
+if (DatosAsiento.isValid()){
+  if(DatosAsiento.validarPartidaDoble()){
+    console.log(DatosAsiento.toJSON())
     fetch('/crearAsiento/', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        nombre,
-        diario_id,
-        fecha,
-        movimientos: [{ cuenta_id, monto, tipo }]
-      })
+      body: JSON.stringify(DatosAsiento.toJSON())
     })
     .then(res => res.json())
     .then(data => {
       console.log(data.text || data.error);
-      if(data.error){
-        var resultado = document.getElementById('resultadoAsiento');
-        resultado.style.display = "block";
-        resultado.innerText = data.error;
-        prinmodal.show();
-      }
       listarAsientos();
+      if(data.error){
+        Alerta(ModalAsiento,data.error);
+      }
     })
     .catch(err => {
         console.error('Error al crear asiento:', err);
     });
+}else{
+   Alerta(ModalAsiento,'No cumple con la reglas de la partida doble');
+}
+  }else{
+    Alerta(ModalAsiento,'Revisa tus datos');
   }
+  
+}
 
-function listarAsientos() {
-    fetch(`/listaAsientos/${obtenerDiarioId()}/`)
-      .then(res => res.json())
-      .then(data => {
-        const div = document.getElementById('lista-asientos');
-        const fecha = new Date();
-    const formateada = `${fecha.getFullYear()}-${(fecha.getMonth() + 1).toString().padStart(2, '0')}-${fecha.getDate().toString().padStart(2, '0')}`;
-        div.innerHTML = '';
-        data.forEach(a => {
-          asiento = `<div class="asientos">
-        <div class="card">
-                <h5 class="card-header text-center">${a.nombre}</h5> 
-                <div class="card-body d-flex flex-row justify-content-around">
-                <div class="d-flex justify-content-center align-items-center" style="font-size:20px; font-weight:bold;">${a.fecha}</div>
-                <table style="font-size 20px">
-                    <thead>
-                    <tr><th width="200">Concepto</th><th <th width="200">Debe</th><th <th width="200">Haber</th>
-                    </thead><tbody>`;
-        a.movimientos.forEach(m => {
-          asiento += `
-            <tr>
-              <td>${m.tipo === 'Debe' ? m.cuenta.nombre :"&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"+m.cuenta.nombre}</td>
-              <td>${m.tipo === 'Debe' ? m.monto : ''}</td>
-              <td>${m.tipo === 'Haber' ? m.monto : ''}</td>
-            </tr>
-          `;
-        });
-            if (formateada === a.fecha){
-                asiento += `<tr><td  colspan="4" class="text-center"><button class="btn btn-primary">Agregar Movimiento</button></td></tr>`;
-            }
-            asiento +=`
-             </tbody>
-                </table>
-                              </div>
-            </div>
-          </div>
-        `;
+ function obtenerDiarioId(){
+    path = window.location.pathname
+    return path.split('/')[2]; 
+}
 
-        div.innerHTML += asiento;
-      });
-      })
-      .catch(err => console.error('Error al listar asientos:', err));
-  }
+function Alerta(principal,msj){
+  alerta.querySelector('.modal-body').innerText = msj;
+        ModalAlerta.show();
+        ModalAlerta._element.addEventListener('hidden.bs.modal', function (event) {
+      principal.show();
+}); 
+}
+var listaasientos = document.getElementById('lista-asientos');
+var totalCargos = document.getElementById('total-cargos');
+var totalAbonos = document.getElementById('total-abonos');
+function listarAsientos(){
+  fetch(`/listaAsientos/${parseInt(obtenerDiarioId())}`).then(data => data.json()).then((d) => {
+    var body =``;
+    var TotalCargos = 0;
+    var TotalAbonos = 0;
+    d.forEach(a => {
+      var cargos = 0;
+      var abonos = 0;
+      a.movimientos.forEach(m => {
+        m.tipo == 'Debe' ? cargos += m.monto: abonos += m.monto
+      }); 
+      TotalAbonos += abonos;
+      TotalCargos += cargos;
+      body += `<tr>
+          <td class='text-center'>${a.fecha}</td>
+          <td class='text-center'>${a.nombre}</td>
+          <td class='text-end'>${cargos.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}</td>
+          <td class='text-end'>${abonos.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })}</td>
+          <td class='text-center'>
+            <button type="button" title="Editar Asiento" class="btn btn-secondary"><i class="bi bi-pen"></i></button>
+            <button type="button" title="Eliminar Asiento" class="btn btn-danger"><i class="bi bi-trash-fill"></i></button>
+          </td>
+
+        </tr>`
+
+    })
+    totalCargos.innerText = TotalCargos.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+    totalAbonos.innerText = TotalAbonos.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+    listaasientos.innerHTML = body;
+  })
+}
+
   </script>
+
+
 {% endblock %}

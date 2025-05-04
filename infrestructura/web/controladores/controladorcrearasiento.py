@@ -16,12 +16,11 @@ class ControladorAsiento:
             for m in movimientos:
                 try:
                     print(m)
-                    self.__ucm.execute(id,m['cuenta_id'],m['monto'],m['tipo'])
-                    return jsonify({'text': 'Asiento generado exitosamente'})
+                    self.__ucm.execute(id,m['cuenta'],m['monto'],m['tipo'])
                 except ErrorMovimiento as e:
                     return jsonify({'error': str(e)}),400
-                except AdvertenciaMovimiento as e:
-                    return jsonify({'text': 'Asiento generado exitosamente','warn':str(e)})
+                                  
+            return jsonify({'text': 'Asiento generado exitosamente'})
 
     def manejar(self,req):
         data = request.get_json()
@@ -29,7 +28,7 @@ class ControladorAsiento:
         try:
             if not 'movimientos' in data:
                 raise ErrorAsiento('El asiento debe contar con por lo menos un movimiento')
-            ac = self.__uca.execute(data['nombre'],data['diario_id'],data['fecha'])
+            ac = self.__uca.execute(data['concepto'],data['tipo'],data['diario_id'],data['fecha'])
             return self.__movimientos(ac.id,data['movimientos'])
         except ErrorAsiento as e:
             return jsonify({'error': str(e)}),400

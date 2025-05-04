@@ -12,7 +12,7 @@ class ListarAsientos:
             for movimiento in self.__repomov.obtenerPorAsiento(asiento.id):
                 movimientos.append(movimiento)
             listaMovimientos.append(movimientos)
-
+        #ordenar por fechas los asientos
         return asientos,listaMovimientos
 
             

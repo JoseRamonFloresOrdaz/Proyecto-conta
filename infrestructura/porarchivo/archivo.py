@@ -14,7 +14,12 @@ class Archivo:
         except FileNotFoundError:
             self.generar_archivo()
         return datos
-
+        
     def guardar(self,linea):
         with open(self.ruta,'a+') as archivo:
             archivo.write(linea)
+
+    def guardar_lista(self,lista):
+        with open(self.ruta,'w') as f:
+            f.writelines(lista)
+

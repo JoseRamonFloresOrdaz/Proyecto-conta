@@ -3,8 +3,7 @@ class ListaCuentas:
         self.__rep = rep
     
     def execute(self,filtro=None,value=None):
-            filtros = ['id','nombre','tipo','todas']
-            match filtro := filtros:
+            match filtro:
                 case 'id':
                     return self.__rep.ObtenerPorId(value)
                 case 'nombre':

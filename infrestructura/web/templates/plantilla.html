@@ -3,8 +3,64 @@
 {% block title %}Plantilla{% endblock %}
 
 {% block content %}
-<table id="balance">
+<div class="d-flex flex-row justify-content-center">
+<table id="balance" class="table">
 </table>
+</div>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    Launch static backdrop modal
+  </button>
+  
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Agregar Cuenta</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="mb-3">
+                <label for="nombreCuenta" class="form-label">Nombre</label>
+                <input type="text" class="form-control" id="nombreCuenta" placeholder="Nombre">
+              </div>
+            <div class="mb-3">
+                <label for="seccionCuenta" class="form-label">Seccion</label>
+                <select id="seccionCuenta" class="form-select form-select-sm" >
+                  <option value="1">ACTIVOS CIRCULANTES</option>
+                  <option value="2">ACTIVOS NO CIRCULANTES</option>
+                  <option value="2">PASIVOS CIRCULANTES</option>
+                  <option value="3">PASIVOS NO CIRCULANTES</option>
+                  <option value="4">CAPITAL CONTRIBUIDO</option>
+                  <option value="5">CAPITAL GANADO</option>
+                </select>
+                </div>
+                <div class="mb-3">
+                    <label for="tipoCuenta" class="form-label">Tipo</label>
+                    <select id="tipoCuenta" class="form-select form-select-sm" >
+                    <option value="Deudora">Deudora</option>
+                     <option value="Acredora">Acredora</option>
+                    </select>
+                    </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="bal.crearCuenta()">Crear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<style>
+    table{
+        max-width: 70%;
+    }
+    thead th{
+        border:none;
+
+    }
+    .concepto{
+        width:60%;
+    }
+</style>
 <script>
     var ref = document.getElementById('balance');
 json = {
@@ -13,12 +69,77 @@ json = {
         "periodo": "1 al 30 de enero de 2025"
     }
     class Cuenta{
-        constructor(tipo,monto){
+        constructor(nombre,tipo,seccion){
             this.nombre = nombre;
             this.tipo = tipo;
+            this.seccion = seccion;
             this.monto = 0;
         }
     }
+
+    class FormularioCuenta{
+        constructor(){
+            this.nombre = document.getElementById('nombreCuenta');
+            this.tipo = document.getElementById('tipoCuenta');
+            this.seccion = document.getElementById('seccionCuenta');
+        }
+        validarNombre(nombre){
+            if (nombre.length > 0){
+                return true
+            }
+        }
+        validarTipo(tipo){
+            if (tipo.length > 0){
+                return true
+            }
+        }
+        validarSeccion(seccion){
+            if (seccion > 0){
+                return true
+            }
+        }
+        is_valid(){
+            console.log(this.nombre.value);
+            console.log(this.seccion.value)
+            console.log(this.tipo.value)
+            if(this.validarNombre(this.nombre.value) && this.validarSeccion(this.seccion.value) && this.validarTipo(this.tipo.value)){
+                return true
+            }
+        }
+        guardar(){
+                return new Cuenta(this.nombre.value,this.tipo.value, this.seccion.value);
+        }
+
+        
+    }
+    function crearProxy(obj, callback) {
+  const handler = {
+    get(target, prop, receiver) {
+      const valor = Reflect.get(target, prop, receiver);
+
+      // Si es un array, también lo proxyamos para detectar mutaciones
+      if (Array.isArray(valor)) {
+        return new Proxy(valor, {
+          set(arrTarget, arrProp, arrValue) {
+            const resultado = Reflect.set(arrTarget, arrProp, arrValue);
+            callback(arrTarget,prop);
+            return resultado;
+          }
+        });
+      }
+
+      return valor;
+    },
+    set(target, prop, value, receiver) {
+      const resultado = Reflect.set(target, prop, value, receiver);
+      callback(target,prop);
+      return resultado;
+    }
+  };
+
+  return new Proxy(obj, handler);
+}
+
 
     class Balance{
         constructor(nombre,empresa,periodo){
@@ -40,6 +161,7 @@ json = {
             this.sumapmasc = 0 
 
         }
+
         agregarActivosCIrculantes(cuenta){
             this.activos_circulantes.push(cuenta);
         }
@@ -61,26 +183,116 @@ json = {
 
     class CargarBalance{
         constructor(ref){
-            const secciones = ['activos_circulantes','activos_no_circualante','pasivos_circulantes','pasivos_no_circualantes','capital']
-            var elementos = []
-            console.log(elementos)
-            secciones.forEach(sec => {
+           this.secciones = ['activos_circulantes','activos_no_circualante','pasivos_circulantes','pasivos_no_circualantes','capital_contribuido','capital_ganado']
+            this.secciones.forEach(sec => {
                 var s = ref.querySelector(`#${sec}`)
                 if (s==undefined){
-                    ref.innerHTML += `<tbody id='${sec}'></tbody>`;
+                    ref.innerHTML += `<tbody id='${sec}'>
+                        <tr><td colspan='3'>${sec.replaceAll('_',' ').toUpperCase()}</td></tr>
+                        </tbody>`;
                     s = ref.querySelector(`#${sec}`)
-                    elementos.push(s)
-                }
-                else{
-                    elementos.push(s)
                 }
             });
         }
-        cargarActivos(){}
+        cargarCabecera(nombre,empresa,fecha){
+            let head;
+            if (document.querySelector('thead')){
+                head = document.querySelector('thead');
+                head.innerHTML ='';
+            }else{
+                head = document.createElement('thead');
+            }
+            head.setAttribute('style','border:none;')
+            head.innerHTML += `<tr><th colspan="3" class="text-center">${nombre}</th></tr>`;
+            head.innerHTML += `<tr><th colspan="3" class="text-center">${empresa}</th></tr>`;
+            head.innerHTML += `<tr><th colspan="3" class="text-center">${fecha}</th></tr>`;
+            head.innerHTML += `<tr><th class="text-center concepto">CONCEPTO</th><th class="text-center">3</th><th class="text-center">4</th></tr>`;
+            ref.appendChild(head);
+        }
+        crearCuenta(nombre,monto,seccion){
+                const tr = document.createElement('tr');
+                const tdNombre = document.createElement('td');
+                tdNombre.textContent = nombre;
+                tdNombre.classList.add('concepto')
+            
+                const tdMonto = document.createElement('td');
+                tdMonto.classList.add('text-end')
+                tdMonto.textContent = monto;
+                const tdVacia = document.createElement('td');
 
+                tr.appendChild(tdNombre);
+                tr.appendChild(tdMonto);
+                tr.appendChild(tdVacia);
+
+            document.getElementById(this.secciones[seccion]).appendChild(tr);
+        }
+        cargarActivosCirciulantes(activos){
+            activos.forEach(a => {
+                this.crearCuenta(a.nombre,a.monto,0)
+            });
+		}
+		cargarActivosNoCirciulantes(activos){
+            activos.forEach(a => {
+                this.crearCuenta(a.nombre,a.monto,1)
+			});
+		
+		}
+		cargarPasivosCirciulantes(pasivos){
+            pasivos.forEach(a => {
+                this.crearCuenta(a.nombre,a.monto,2)
+			});
+		}
+		cargarPasivosNoCirciulantes(pasivos){
+            pasivos.forEach(a => {
+                this.crearCuenta(a.nombre,a.monto,3)
+			});
+		
+		}
+		cargarCapitalContribuido(capital){
+            capital.forEach(a => {
+                this.crearCuenta(a.nombre,a.monto,4)
+            
+		});
+		}
+		
+		cargarCapitalGanado(capital){
+            capital.forEach(a => {
+                this.crearCuenta(a.nombre,a.monto,6)
+		});
     }
+}
+class ControlBalance{
+    constructor(cargar_cuentas){
+        this.cargar = cargar_cuentas;
+        this.cambios = this.cambios.bind(this);
+        this.balance = crearProxy(new Balance('','',''),this.cambios)
+    }
+    cambios(target,propiedad){
+        if(propiedad == 'nombre' || propiedad == 'empresa' || propiedad == 'periodo'){
+            this.cargar.cargarCabecera(target.nombre,target.empresa,target.periodo)
+        }
+        if(propiedad == 'activos_circulantes'){
+            this.cargar.cargarActivosCirciulantes(target)
+        }
+    }
+    crearCuenta(){
+        var form = new FormularioCuenta()
+        if (form.is_valid()){
+            console.log('es valido')
+            var cuenta = form.guardar()
+            console.log(cuenta.seccion);
+            switch(parseInt(cuenta.seccion)){
+                case 1:
+                    console.log('activos circulantes');
+                    this.balance.activos_circulantes.push(cuenta)
+            }
+        }
+    }
+}
 
-bal = new CargarBalance(ref)
+var control = new CargarBalance(ref);
+var bal = new ControlBalance(control);
+
 
 
 </script>

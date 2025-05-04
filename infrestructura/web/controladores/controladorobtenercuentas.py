@@ -8,7 +8,6 @@ class ObtenerCuentas:
     def manejar(self,req):
         cuentas = []
         for d in self.__ucc.execute('todas'):
-            print(d)
             cuentas.append({'id':d.id,'nombre':d.nombre,'tipo':d.tipo.value})
 
         return jsonify(cuentas),200

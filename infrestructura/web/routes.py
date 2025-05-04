@@ -27,7 +27,6 @@ def plantilla(diario_id):
 def crear_diario():
     return controladorDiario.manejar(request)
 
-
 @app.route('/crearAsiento/',methods=['POST'])
 def crear_asiento():
     return controladorasiento.manejar(request)

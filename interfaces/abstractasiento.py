@@ -15,6 +15,8 @@ class AbstractAsiento(ABC):
         pass
     def obtenerPorFecha(self,fecha):
         pass
+    def obtenerPorTipo(self,tipo):
+        pass
     @abstractmethod
     def obtenerPorDiario(self,id):
         pass

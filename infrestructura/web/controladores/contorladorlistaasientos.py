@@ -16,10 +16,11 @@ class ControladorListarAsientos:
             asientos,lista_movimientos = self.__uca.execute(diario_id)
             for pos in range(len(asientos)):
                 ac = {'id':asientos[pos].id,'nombre':asientos[pos].nombre,'fecha':asientos[pos].fecha}
-                print(ac)
                 l = []
                 for movimiento in lista_movimientos[pos]:
-                    cuenta = self.__ucc.execute('id',movimiento.cuenta_id)[0]
+                    print(movimiento.cuenta_id)
+                    cuenta = self.__ucc.execute('id',movimiento.cuenta_id)
+                    print(cuenta)
                     l.append({'asiento_id':movimiento.asiento_id,'cuenta':{'id':cuenta.id,'nombre':cuenta.nombre},'monto':movimiento.monto,'tipo':movimiento.tipo.value})
                 ac['movimientos'] = l
                 acs.append(ac)
